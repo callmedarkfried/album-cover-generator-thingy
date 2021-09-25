@@ -2,13 +2,14 @@
 Board b;
 int count = 0;
 void setup() {
- size(500, 500);
+ size(1000, 1000);
  background(0);
  colorMode(RGB, 255);
- b = new Board(250, 250);
+ b = new Board(100, 100);
+ strokeWeight(0);
  b.drawBoard();
  frameRate(60);
- strokeWeight(0);
+ 
 }
 
 void draw() {

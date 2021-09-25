@@ -19,7 +19,7 @@ public class Board {
     for (int x = 0; x < board.length; x++) {
       for (int y = 0; y < board[x].length; y++) {
         PVector p = new PVector(x, y, 0);
-        board[x][y] = new Cell(c, p, b);
+        board[x][y] = new Cell(c, p, b, board.length, board[x].length);
       }
     }
 
@@ -31,6 +31,7 @@ public class Board {
     //}
     
     frame();
+    println("done");
   }
 
   public int[] getSize() {
@@ -44,17 +45,20 @@ public class Board {
   private void frame() {
     clearOwners();
    for (float i = 0; i < 38; i++) {
-      int x = (int) ((10.0 * cos(frameCount*PI/10.0-2) + 90) * cos(i/TWO_PI));
-      int y = (int) ((10.0 * cos(frameCount*PI/10.0-2) + 90) * sin(i/TWO_PI));
-      board[x+125][y+125].setOwner(b[0]);
+      int r = int(board.length * 0.4 / 2);
+      int x = (int) (r * cos(i/TWO_PI));
+      int y = (int) (r * sin(i/TWO_PI));
+      board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[0]);
       
-      x = (int) ((15.0 * cos(frameCount*PI/15.0-1) + 75) * cos(i+0.5/TWO_PI));
-      y = (int) ((15.0 * cos(frameCount*PI/15.0-1) + 75) * sin(i+0.5/TWO_PI));
-      board[x+125][y+125].setOwner(b[1]);
+      r = int(board.length * 0.35 / 2);
+      x = (int) (r * cos(i+0.5/TWO_PI));
+      y = (int) (r * sin(i+0.5/TWO_PI));
+      board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[1]);
       
-      x = (int) ((20.0 * cos(frameCount*PI/20.0) + 60) * cos(i+1/TWO_PI));
-      y = (int) ((20.0 * cos(frameCount*PI/20.0) + 60) * sin(i+1/TWO_PI));
-      board[x+125][y+125].setOwner(b[2]);
+      r = int(board.length * 0.3 / 2);
+      x = (int) (r * cos(i+1/TWO_PI));
+      y = (int) (r * sin(i+1/TWO_PI));
+      board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[2]);
     } 
   }
   void clearOwners() {
@@ -74,8 +78,8 @@ public class Board {
       for (int y = 0; y < board[x].length; y++) {
         int xPos = width / board.length * x + width / board.length / 2;
         int yPos =  height / board[x].length * y +  height / board[x].length / 2;
-        int xSize = width / board.length - 0;
-        int ySize =  height / board[x].length - 0;
+        int xSize = width / board.length + 1;
+        int ySize =  height / board[x].length  + 1;
 
         if (((Cell)board[x][y]).hasOwner() && false) {
           board[x][y].setColor( board[x][y].getOwner().getColor());
@@ -85,6 +89,7 @@ public class Board {
             255 - ((Cell)board[x][y]).getAllScores()[1], 
             255 - ((Cell)board[x][y]).getAllScores()[2]));
         }
+        stroke(board[x][y].getColor());
         fill(board[x][y].getColor());
         rect(xPos, yPos, xSize, ySize);
       }

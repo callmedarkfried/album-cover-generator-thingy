@@ -8,8 +8,12 @@ public class Cell implements BoardElement {
   private Bot[] agents;
   private float[] scores;
   private float scale;
+  private int bsx;
+  private int bsy;
   
-  Cell(color c, PVector p, Bot[] b) {
+  Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY) {
+    bsx = boardSizeX;
+    bsy = boardSizeY;
     col = c;
     pos = p;
     owner = null;
@@ -17,10 +21,16 @@ public class Cell implements BoardElement {
     agents = b;
     scores = new float[b.length];
     for (float s : scores) s = 0;
-    scale = 1;
-    //scale *=  (160-(sqrt((p.x - 125)*(p.x - 125) + (p.y - 125)*(p.y - 125))))/8;
-    //scale *= ((cos(2*scale) +cos(3*scale) +cos(5*scale) +cos(7*scale) +cos(1*scale)) / 15 + 0.6); 
-    scale *= 10-10*abs(cos(PI*p.x/10.0)*cos(PI*p.y/10.0));
+    float cosScale = 1.0/bsx*75;
+    PVector centeroffset = new PVector(bsx, bsy, 0);
+    float distFromOff = sqrt((p.x - centeroffset.x)*(p.x - centeroffset.x) + (p.y - centeroffset.y)*(p.y - centeroffset.y));
+    
+    scale = 5;
+    
+    scale = 1.0/bsx*(100*scale);
+    scale *=  (sqrt(bsx*bsx + bsy*bsy)-(distFromOff))/(2*sqrt(bsx*bsx + bsy*bsy)/10);
+    scale *= ((cos(2*distFromOff*cosScale) +cos(3*distFromOff*cosScale) +cos(5*distFromOff*cosScale) +cos(7*distFromOff*cosScale) +cos(1*distFromOff*cosScale)) / 15 + 0.6); 
+    //scale *= 10-10*abs(cos(PI*p.x/10.0)*cos(PI*p.y/10.0));
     //scale *= 10*atan2(p.x, p.y);
   }
   
