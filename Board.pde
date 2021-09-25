@@ -29,9 +29,27 @@ public class Board {
     //  board[125][(int) (i*i*i / 10.648)].setOwner(b[0]);
     //  board[125][249 - (int) (i*i*i / 10.648)].setOwner(b[0]);
     //}
-    
-    frame();
-    println("done");
+  }
+  
+    Board (int sizeX, int sizeY, boolean testPattern) {
+    colorMode(RGB, 255);
+    color c = color(0);
+
+    board = new BoardElement[sizeX][sizeY];
+    for (int x = 0; x < board.length; x++) {
+      for (int y = 0; y < board[x].length; y++) {
+        PVector p = new PVector(x, y, 0);
+        board[x][y] = new Cell(c, p, b, board.length, board[x].length);
+      }
+    }
+
+    //for (int i = 0; i < 12; i++) {
+    //  board[(int) (i*i*i / 10.648)][125].setOwner(b[1]);
+    //  board[249 - (int) (i*i*i / 10.648)][125].setOwner(b[1]);
+    //  board[125][(int) (i*i*i / 10.648)].setOwner(b[0]);
+    //  board[125][249 - (int) (i*i*i / 10.648)].setOwner(b[0]);
+    //}
+    if (testPattern) frame();
   }
 
   public int[] getSize() {
@@ -42,7 +60,7 @@ public class Board {
   public void addTile(int x, int y, int i) {
     board[x][y].setOwner(b[i]);
   }
-  private void frame() {
+  public void frame() {
     clearOwners();
    for (float i = 0; i < 38; i++) {
       int r = int(board.length * 0.4 / 2);
@@ -60,6 +78,7 @@ public class Board {
       y = (int) (r * sin(i+1/TWO_PI));
       board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[2]);
     } 
+    println("done");
   }
   void clearOwners() {
     for (BoardElement[] b : board) {

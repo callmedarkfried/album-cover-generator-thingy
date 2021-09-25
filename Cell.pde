@@ -25,12 +25,12 @@ public class Cell implements BoardElement {
     PVector centeroffset = new PVector(bsx, bsy, 0);
     float distFromOff = sqrt((p.x - centeroffset.x)*(p.x - centeroffset.x) + (p.y - centeroffset.y)*(p.y - centeroffset.y));
     
-    scale = 5;
+    scale = 0.5;
     
     scale = 1.0/bsx*(100*scale);
-    scale *=  (sqrt(bsx*bsx + bsy*bsy)-(distFromOff))/(2*sqrt(bsx*bsx + bsy*bsy)/10);
-    scale *= ((cos(2*distFromOff*cosScale) +cos(3*distFromOff*cosScale) +cos(5*distFromOff*cosScale) +cos(7*distFromOff*cosScale) +cos(1*distFromOff*cosScale)) / 15 + 0.6); 
-    //scale *= 10-10*abs(cos(PI*p.x/10.0)*cos(PI*p.y/10.0));
+    //scale *=  (sqrt(bsx*bsx + bsy*bsy)-(distFromOff))/(2*sqrt(bsx*bsx + bsy*bsy)/10);
+    //scale *= ((cos(2*distFromOff*cosScale) +cos(3*distFromOff*cosScale) +cos(5*distFromOff*cosScale) +cos(7*distFromOff*cosScale) +cos(1*distFromOff*cosScale)) / 15 + 0.6); 
+    scale *= 10-10*abs(cos(PI*p.x/10.0)*cos(PI*p.y/10.0));
     //scale *= 10*atan2(p.x, p.y);
   }
   

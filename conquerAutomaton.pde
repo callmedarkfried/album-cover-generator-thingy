@@ -5,15 +5,26 @@ void setup() {
  size(1000, 1000);
  background(0);
  colorMode(RGB, 255);
- b = new Board(100, 100);
+ b = new Board(500, 500);
  strokeWeight(0);
  b.drawBoard();
+ // This sets a sort of test pattern, remove if you want to draw yourself.
+  b.frame();
  frameRate(60);
  
 }
 
 void draw() {
- b.drawBoard(); 
+  
+  
+  // Remove this if you enjoy a black screen
+  b.drawBoard(); 
+ 
+
+ // Remove this if you DON'T want to draw. Useful to see the test pattern without having to recalculate every cell each frame
+ if (frameCount == 1) {
+   noLoop();
+ }
 }
 
 void mousePressed() {
