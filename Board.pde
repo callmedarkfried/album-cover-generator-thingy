@@ -63,22 +63,22 @@ public class Board {
   public void frame() {
     clearOwners();
    for (float i = 0; i < 38; i++) {
-      int r = int(board.length * 0.4 / 2);
+      int r = int(board.length * 0.65 / 2);
       int x = (int) (r * cos(i/TWO_PI));
       int y = (int) (r * sin(i/TWO_PI));
       board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[0]);
       
-      r = int(board.length * 0.35 / 2);
+      r = int(board.length * 0.6 / 2);
       x = (int) (r * cos(i+0.5/TWO_PI));
       y = (int) (r * sin(i+0.5/TWO_PI));
       board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[1]);
       
-      r = int(board.length * 0.3 / 2);
+      r = int(board.length * 0.55 / 2);
       x = (int) (r * cos(i+1/TWO_PI));
       y = (int) (r * sin(i+1/TWO_PI));
       board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[2]);
     } 
-    println("done");
+    
   }
   void clearOwners() {
     for (BoardElement[] b : board) {

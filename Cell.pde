@@ -21,22 +21,41 @@ public class Cell implements BoardElement {
     agents = b;
     scores = new float[b.length];
     for (float s : scores) s = 0;
-    float cosScale = 1.0/bsx*75;
+    
+    // These are your main parameters for this whole thing
+    float cosScale = 75;
+    scale = 4;
     PVector centeroffset = new PVector(bsx, bsy, 0);
+    float dotAmt = 50;
+    float dotFallOffStrength = 5;
+    
+    dotAmt = bsx/dotAmt;
+    cosScale = 1.0/bsx*cosScale;
     float distFromOff = sqrt((p.x - centeroffset.x)*(p.x - centeroffset.x) + (p.y - centeroffset.y)*(p.y - centeroffset.y));
-    
-    scale = 0.5;
-    
-    scale = 1.0/bsx*(100*scale);
-    //scale *=  (sqrt(bsx*bsx + bsy*bsy)-(distFromOff))/(2*sqrt(bsx*bsx + bsy*bsy)/10);
-    //scale *= ((cos(2*distFromOff*cosScale) +cos(3*distFromOff*cosScale) +cos(5*distFromOff*cosScale) +cos(7*distFromOff*cosScale) +cos(1*distFromOff*cosScale)) / 15 + 0.6); 
-    scale *= 10-10*abs(cos(PI*p.x/10.0)*cos(PI*p.y/10.0));
-    //scale *= 10*atan2(p.x, p.y);
+    //scale = 1.0/bsx*(100*scale);
+    scale =  hyperbolicLike(scale, distFromOff);
+    scale = primeCosineRings(scale, distFromOff, cosScale, 15, 0.6);
+    //scale = dotMatrix(scale, p, dotAmt, dotFallOffStrength);
+    //scale = atanMap(scale, p.y, p.x, 1);//10*atan2(p.x, p.y);
   }
   
-  public float gaussScale(float x) {
-    float res = min(x, 100-x);
-    return res;
+  
+  // Sort of hyperbolic but not really. DistFromOff is the distance a cell has from the specified center (PVector centeroffset), space is "compressed" according to how close
+  // The cell is, meaning cells further away from the center are closer to EVERY cell at once.
+  private float hyperbolicLike(float in, float distFromOff) {
+    return in * (sqrt(bsx*bsx + bsy*bsy)-(distFromOff))/(2*sqrt(bsx*bsx + bsy*bsy)/10);
+  }
+  
+  private float primeCosineRings(float in, float distFromOff, float cosScale, float divisor, float offset) {
+    return in * (((cos(2*distFromOff*cosScale) +cos(3*distFromOff*cosScale) +cos(5*distFromOff*cosScale) +cos(7*distFromOff*cosScale) +cos(1*distFromOff*cosScale)) / divisor + offset)); 
+  }
+  
+  private float dotMatrix(float in, PVector p, float dotAmt, float dotFallOffStrength) {
+    return in * (dotFallOffStrength-dotFallOffStrength*abs(cos(PI*p.x/dotAmt)*cos(PI*p.y/dotAmt)));
+  }
+  
+  private float atanMap(float in, float x, float y, float falloff) {
+    return falloff*atan2(x, y);
   }
   
   public void clearOwner() {
