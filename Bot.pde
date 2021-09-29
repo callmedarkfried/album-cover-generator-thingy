@@ -23,7 +23,9 @@ public class Bot implements BoardElement {
    return borderCellsUC; 
   }
   
-
+  public Cell[] getOwnedCells() {
+   return ownedCells; 
+  }
   
   
   public void conquerClaimedCell(Cell c) {

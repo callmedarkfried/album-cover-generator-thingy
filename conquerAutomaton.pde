@@ -5,7 +5,7 @@ void setup() {
  size(1000, 1000);
  background(0);
  colorMode(RGB, 255);
- b = new Board(200, 200, true);
+ b = new Board(1000, 1000, true);
  strokeWeight(0);
  b.drawBoard();
  frameRate(60);

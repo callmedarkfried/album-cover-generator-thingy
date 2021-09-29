@@ -30,8 +30,8 @@ public class Board {
     //  board[125][249 - (int) (i*i*i / 10.648)].setOwner(b[0]);
     //}
   }
-  
-    Board (int sizeX, int sizeY, boolean testPattern) {
+
+  Board (int sizeX, int sizeY, boolean testPattern) {
     colorMode(RGB, 255);
     color c = color(0);
 
@@ -62,23 +62,24 @@ public class Board {
   }
   public void frame() {
     clearOwners();
-   for (float i = 0; i < 38; i++) {
+    int numberOfDots = 36;
+   
+    for (float i = 0; i < numberOfDots; i++) {
       int r = int(board.length * 0.65 / 2);
-      int x = (int) (r * cos(i/TWO_PI));
-      int y = (int) (r * sin(i/TWO_PI));
+      int x = (int) (r * cos(radians(360.0/numberOfDots*i)));
+      int y = (int) (r * sin(radians(360/numberOfDots*i)));
       board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[0]);
-      
+
       r = int(board.length * 0.6 / 2);
       x = (int) (r * cos(i+0.5/TWO_PI));
       y = (int) (r * sin(i+0.5/TWO_PI));
       board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[1]);
-      
+
       r = int(board.length * 0.55 / 2);
       x = (int) (r * cos(i+1/TWO_PI));
       y = (int) (r * sin(i+1/TWO_PI));
       board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[2]);
-    } 
-    
+    }
   }
   void clearOwners() {
     for (BoardElement[] b : board) {
@@ -89,9 +90,9 @@ public class Board {
   }
 
   public void drawBoard() {
-    
-    
-    
+
+
+
     rectMode(CENTER);
     for (int x = 0; x < board.length; x++) {
       for (int y = 0; y < board[x].length; y++) {
