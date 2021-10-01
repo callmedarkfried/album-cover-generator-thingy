@@ -7,7 +7,7 @@ void setup() {
  colorMode(RGB, 255);
  b = new Board(1000, 1000, true);
  strokeWeight(0);
- b.drawBoard();
+ //b.drawBoard();
  frameRate(60);
  
 }
@@ -16,8 +16,7 @@ void draw() {
   
   
   // Remove this if you enjoy a black screen
-  b.drawBoard(); 
- 
+  b.drawBoard();
 
  // Remove this if you DON'T want to draw. Useful to see the test pattern without having to recalculate every cell each frame
  if (frameCount == 1) {

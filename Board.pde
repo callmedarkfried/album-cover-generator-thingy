@@ -60,6 +60,29 @@ public class Board {
   public void addTile(int x, int y, int i) {
     board[x][y].setOwner(b[i]);
   }
+  
+  public void img() {
+    clearOwners();
+    PImage img = loadImage("ooer.png");
+    img.loadPixels();
+    for (int x = 0; x < img.width; x++) {
+      for (int y = 0; y < img.height; y++) {
+        color c = img.get(x, y);
+        if (red(c) > 200.0) {
+          ((Cell) board[x][y]).setOwner(b[0]);
+        }
+        if (green(c) > 200.0) {
+          ((Cell) board[x][y]).setOwner(b[1]);
+        }
+        if (blue(c) > 200.0) {
+          ((Cell) board[x][y]).setOwner(b[2]);
+        }
+      }
+    }
+    println("image");
+    drawBoard();
+  }
+  
   public void frame() {
     clearOwners();
     int numberOfDots = 36;
@@ -94,6 +117,15 @@ public class Board {
 
 
     rectMode(CENTER);
+    sendBorderUpdateUnclaimed(b[0]);
+    sendBorderUpdateUnclaimed(b[1]);
+    sendBorderUpdateUnclaimed(b[2]);
+    sendBorderUpdateClaimed(b[0]);
+    sendBorderUpdateClaimed(b[1]);
+    sendBorderUpdateClaimed(b[2]);
+    setScore(b[0]);
+    setScore(b[1]);
+    setScore(b[2]);
     for (int x = 0; x < board.length; x++) {
       for (int y = 0; y < board[x].length; y++) {
         int xPos = width / board.length * x + width / board.length / 2;
@@ -119,15 +151,7 @@ public class Board {
     //  sendBorderUpdateClaimed(a);
     //  setScore(a);
     //}
-    sendBorderUpdateUnclaimed(b[0]);
-    sendBorderUpdateUnclaimed(b[1]);
-    sendBorderUpdateUnclaimed(b[2]);
-    sendBorderUpdateClaimed(b[0]);
-    sendBorderUpdateClaimed(b[1]);
-    sendBorderUpdateClaimed(b[2]);
-    setScore(b[0]);
-    setScore(b[1]);
-    setScore(b[2]);
+    
     //saveFrame("frames/####.png");
   }
 
