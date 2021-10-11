@@ -38,8 +38,6 @@ public class Board {
     colorMode(RGB, 255);
     color c = color(0);
     
-    scales = loadImage("v1.png");
-    scales.loadPixels();
     
     board = new BoardElement[sizeX][sizeY];
     for (int x = 0; x < board.length; x++) {
