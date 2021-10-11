@@ -1,5 +1,5 @@
 import java.util.Arrays;
-
+import java.lang.Math;
 public class Cell implements BoardElement {
   private color col;
   private PVector pos;
@@ -24,13 +24,15 @@ public class Cell implements BoardElement {
   
     // These are your main parameters for this whole thing
     float cosScale = 75;
-    scale = 200;
-    float dotGridScale = 5;
+    scale = 10;
+    float dotGridScale = 1;
     PVector centeroffset = new PVector(bsx/2, bsy/2, 0);
     float dotAmt = 40;
     float dotFallOffStrength = 10;
     float hyperbolicScale = 1;
-
+    float tScale = scale;
+    float stepCount = 6;
+    float substepCount = 8;
 
     // DONT ALTER THIS (FOR NOW)
     PVector offsetPos = new PVector(p.x - centeroffset.x, p.y - centeroffset.y);
@@ -40,18 +42,26 @@ public class Cell implements BoardElement {
     scale = 1.0/bsx*(100*scale);
     // END OF DO NOT ALTER
     
-    // these 6 methods can be combined in any way you want.
-    // scale = hyperbolicLike(scale, distFromOff, hyperbolicScale);
+    PVector hbpos = cartesianToHyperbolic(scale(offsetPos, 0.01));
+    float hyperDist = sqrt(hbpos.x*hbpos.x + hbpos.y*hbpos.y);
+    if(hbpos.y % 10 > 9.9 || hbpos.x % 0.1 <= 0.001) {
+      scale = 0;
+    } else {
+      scale = 100;
+    }
+    scale = hyperDist;
+    
+    scale = distFromOff / 200 / hyperDist;
+    // these  methods can be combined in any way you want.
+    //scale = hyperbolicLike(scale, distFromOff, hyperbolicScale);
     //scale = primeCosineRings(scale, distFromOff, cosScale, 15, 0.6);
-    //scale = dotMatrix(scale, offsetPos, dotAmt, dotFallOffStrength);
+    //scale = dotMatrix(10, offsetPos, dotAmt, dotFallOffStrength);
     //scale = grid(scale, p, dotAmt, dotFallOffStrength);
-    // scale = atanMap(scale, p.y, p.x, 1);
-    //scale = dotGrid(dotGridScale, p.x, p.y, 100, 0.2, 150);
+    //scale = atanMap(scale, p.y, p.x, 1);
+    //scale = dotGrid(dotGridScale, offsetPos.x, offsetPos.y, 100, 0.2, 150);
     //scale = betterDots(2, p.x, p.y, 10, 0.4, 4, 8, 8, 10);
-    //scale = betterDots(2, cartesianToPolar(p).x, cartesianToPolar(p).y, 10, 0.4, 4, 10, 8, 10);
-    float tScale = scale;
-    float stepCount = 6;
-    float substepCount = 8;
+    //scale = betterDots(scale, cartesianToPolar(offsetPos).x, cartesianToPolar(offsetPos).y, 10, 0.4, 4, 10, 8, 10);
+    
     
     //float s1 = betterDots(scale, cartesianToPolar(p).x,                                 cartesianToPolar(p).y,                                 stepCount, 0.4, 4, substepCount, 8, 10);
     //float s2 = betterDots(scale, cartesianToPolar(new PVector(p.x - bsx, p.y)).x,       cartesianToPolar(new PVector(p.x - bsx, p.y)).y,       stepCount, 0.4, 4, substepCount, 8, 10);
@@ -67,29 +77,170 @@ public class Cell implements BoardElement {
     // s0
     //scale = dotMatrix(scale, p, distFromOff, dotFallOffStrength);
     
+    //s0 with more weirdness
+    //scale = dotMatrix(scale, p, distFromOff, dotFallOffStrength);
+    //scale = dotMatrix(scale, p, dotAmt * hyperbolicLike(scale, distFromOff, hyperbolicScale), dotFallOffStrength);
+    
     // cardioid
     //scale = dotMatrix(scale, cartesianToPolar(offsetPos), distFromOff, dotFallOffStrength);
     
+    //flower thing
+    //scale = flower(1, offsetPos, 12, 10, bsx * 0.2, 0.6, 0);
+    //scale = flower2(1, offsetPos, 12, 10, bsx * 0.2, 0.6, 0,false);
     
     
-    scale =altCosLines(6, p, 0.1, 0.5, 0.25, 1, 2);
+    
+    //scale =altCosLines(6, p, 0.1, 0.5, 0.25, 1, 2);
     //fun thing:
-    scale = primeCosineRings(hyperbolicLike(scale, distFromOff, hyperbolicScale), atanMap(scale, p.y, p.x, 1), dotMatrix(scale, p, dotAmt, dotFallOffStrength), 15, 0.6);
+    //scale = primeCosineRings(hyperbolicLike(scale, distFromOff, hyperbolicScale), atanMap(scale, p.y, p.x, 1), dotMatrix(scale, p, dotAmt, dotFallOffStrength), 15, 0.6);
     //scale = minSquares(scale, p.x, p.y, 10, 0);
     //omin mind:
    //scale = dotMatrix(primeCosineRings(hyperbolicLike(scale, distFromOff, hyperbolicScale), distFromOff, cosScale, 15, 0.6), p, hyperbolicLike(primeCosineRings(hyperbolicLike(scale, distFromOff, hyperbolicScale), distFromOff, cosScale, 15, 0.6), distFromOff, hyperbolicScale), dotFallOffStrength);
    
    //scale = betterDots(2, p.x, p.y, hyperbolicLike(scale, distFromOff, hyperbolicScale), 0.4, 4, 8, 8, 10);
     
+    //overlapping circles
+    //scale = circles(2, p, 1, 1, 1);
+    
+    
+    
     // cover warped fots
     //scale = dotMatrix(scale, p, dotAmt * hyperbolicLike(scale, distFromOff, hyperbolicScale), dotFallOffStrength);
   }
 
+//Predefined scale
+Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
+    bsx = boardSizeX;
+    bsy = boardSizeY;
+    col = c;
+    pos = p;
+    owner = null;
+    score = 10000;
+    agents = b;
+    scores = new float[b.length];
+    for (float s : scores) s = 0;
+    
+    // These are your main parameters for this whole thing
+    float cosScale = 75;
+    scale = 10;
+    float dotGridScale = 1;
+    PVector centeroffset = new PVector(bsx/2, bsy/2, 0);
+    float dotAmt = 40;
+    float dotFallOffStrength = 10;
+    float hyperbolicScale = 1;
+    float tScale = scale;
+    float stepCount = 6;
+    float substepCount = 8;
+
+    // DONT ALTER THIS (FOR NOW)
+    PVector offsetPos = new PVector(p.x - centeroffset.x, p.y - centeroffset.y);
+    dotAmt = bsx/dotAmt;
+    cosScale = 1.0/bsx*cosScale;
+    float distFromOff = sqrt((p.x - centeroffset.x)*(p.x - centeroffset.x) + (p.y - centeroffset.y)*(p.y - centeroffset.y));
+    scale = 1.0/bsx*(100*scale);
+    // END OF DO NOT ALTER
+    
+    scale = scl;
+    scale = dotMatrix(scale, p, dotAmt * hyperbolicLike(scale, distFromOff, hyperbolicScale), dotFallOffStrength);
+}
 
   // Sort of hyperbolic but not really. DistFromOff is the distance a cell has from the specified center (PVector centeroffset), space is "compressed" according to how close
   // The cell is, meaning cells further away from the center are closer to EVERY cell at once.
   private float hyperbolicLike(float in, float distFromOff, float divisor) {
     return in * (sqrt(bsx*bsx/divisor + bsy*bsy/divisor)-(distFromOff))/(2*sqrt(bsx*bsx/divisor + bsy*bsy/divisor)/10);
+  }
+  
+  private PVector scale(PVector in, float s) {
+    return new PVector(in.x * s, in.y * s);
+  }
+  
+  private PVector translate(PVector v, PVector t) {
+    return new PVector(v.x + t.x, v.y + t.y);
+  }
+  
+  private PVector translate(PVector v, float x, float y) {
+    return new PVector(v.x + x, v.y + y);
+  }
+  
+  private float circles (float scaling, PVector p, float pow, float fac, float offset) {
+    //float scaling = 100 / sqrt(bsx/2*bsx/2 + bsy/2*bsy/2);
+    //float pow = 1;
+    //float fac = 1;
+    //float offset = 1;
+    
+    PVector c1 = new PVector(0,0);
+    PVector c2 = new PVector(bsx,0);
+    PVector c3 = new PVector(0,bsy);
+    PVector c4 = new PVector(bsx,bsy);
+    
+    float dist1 = scaling * sqrt( (c1.x - p.x)*(c1.x - p.x) + (c1.y - p.y)*(c1.y - p.y) );
+    float dist2 = scaling * sqrt( (c2.x - p.x)*(c2.x - p.x) + (c2.y - p.y)*(c2.y - p.y) );
+    float dist3 = scaling * sqrt( (c3.x - p.x)*(c3.x - p.x) + (c3.y - p.y)*(c3.y - p.y) );
+    float dist4 = scaling * sqrt( (c4.x - p.x)*(c4.x - p.x) + (c4.y - p.y)*(c4.y - p.y) );
+    
+    float m1 = fac - (fac * pow(abs((dist1 % 2) - 1), pow));
+    float m2 = fac - (fac * pow(abs((dist2 % 2) - 1), pow));
+    float m3 = fac - (fac * pow(abs((dist3 % 2) - 1), pow));
+    float m4 = fac - (fac * pow(abs((dist4 % 2) - 1), pow));
+    
+    return (min(min(m1,m2,m3), m4 ) + offset);
+  }
+  
+  private float flower2(float in, PVector pos, float numberOfDots, float mod, float r, float pwr, float phase, boolean cosineFilter) {
+    
+    PVector[] cc = new PVector[floor(numberOfDots)];
+    float[] d = new float[floor(numberOfDots)];
+    
+    for (float i = 0; i < floor(numberOfDots); i++) {
+      float x = (r * cos(radians(360.0/numberOfDots*i)));
+      float y = (r * sin(radians(360/numberOfDots*i)));
+      cc[floor(i)] = new PVector(x,y);
+      d[floor(i)] = abs(dist(cc[(int) i].x, cc[(int) i].y, pos.x,pos.y));
+    }
+    
+    float temp = 1;
+    
+    for(int i = 0; i < floor(numberOfDots); i++) {
+      temp += d[i];
+    }
+    
+    float fac;
+    float mind = min(d) * (cosineFilter?(cos(min(d)/ 10) + 1):1);
+    if (int(mind / mod) % 2 == 0) {
+      fac = mind % mod;
+    } else {
+      fac = mod - (mind % mod);
+    }
+    
+    return in * pow(fac, pwr);
+  }
+  
+  private float flower(float in, PVector pos, float numberOfDots, float mod, float r, float pwr, float phase){
+    
+    PVector[] cc = new PVector[floor(numberOfDots)];
+    float[] d = new float[floor(numberOfDots)];
+    
+    for (float i = 0; i < floor(numberOfDots); i++) {
+      float x = (r * cos(radians(360.0/numberOfDots*i)));
+      float y = (r * sin(radians(360/numberOfDots*i)));
+      cc[floor(i)] = new PVector(x,y);
+      d[floor(i)] = abs(dist(cc[(int) i].x, cc[(int) i].y, pos.x,pos.y));
+    }
+    
+    float temp = 1;
+    
+    for(int i = 0; i < floor(numberOfDots); i++) {
+      temp *= d[i];
+    }
+    
+    
+    float fac;
+    if (int(   (pow(temp, 1.0/(numberOfDots + 1)) + phase) / mod)    % 2 == 0) {
+      fac =    (pow(temp, 1.0/(numberOfDots + 1)) + phase) % mod;
+    } else {
+      fac = mod - (pow(temp, 1.0/(numberOfDots + 1)) + phase) % mod;
+    }
+    return in * pow(fac, pwr); 
   }
   
   private float linearCosStripes(float scale, PVector p, float angle, float f, float thresh, float epsilon, float off) {
@@ -243,8 +394,58 @@ public class Cell implements BoardElement {
    private PVector cartesianToPolar(PVector in) {
      PVector out = new PVector(0,0);
      
-     out.x = atan(in.y / in.x);
+     out.x = degrees(atan(in.y / in.x));
      out.y = sqrt(in.x*in.x + in.y*in.y);
+     
+     return out;
+   }
+   
+      private PVector cartesianToHyperbolicLike(PVector in) {
+     PVector out = new PVector(0,0);
+     in = cartesianToPolar(in);
+     
+     //if (in.x < 90 || (in.x > 270 && in.x< 360)) {
+     //  in.x += 90;
+     //}
+     
+     out.y = (in.y) * abs((float) Math.cosh(radians(in.x)));
+     out.x = (in.y) * abs((float) Math.sinh(radians(in.x)));
+     
+     return out;
+   }
+   
+    private PVector cartesianToHyperbolic(PVector in) {
+     PVector out = new PVector(0,0);
+     
+     if(in.y == 0) in.y = 0.0001;
+     if(in.x == 0) in.x = 0.0001; 
+     
+     
+     if (in.x > 0 && in.y <= 0) in.y *= -1;
+     if (in.x < 0 && in.y >= 0) in.y *= -1;
+     
+     out.x = log(sqrt(in.x/in.y));
+     out.y = sqrt(in.x*in.y);
+     
+     float r = out.y;
+     float t = out.x;
+     
+     out.y = (r) * abs((float) Math.cos(radians(t)));
+     out.x = (r) * abs((float) Math.sin(radians(t)));
+     
+     
+     
+     return out;
+   }
+   private PVector euclidToExponential(PVector in) {
+     PVector out = new PVector(0,0);
+     
+     in = cartesianToPolar(in);
+     
+     in.y = exp(in.y/100);
+     
+     out.y = (in.y) * abs((float) Math.cos(radians(in.x)));
+     out.x = (in.y) * abs((float) Math.sin(radians(in.x)));
      
      return out;
    }
@@ -277,6 +478,7 @@ public class Cell implements BoardElement {
   public void setScale(int s) {
     scale = s;
   }
+  
 
   public float getScale() {
     return scale;

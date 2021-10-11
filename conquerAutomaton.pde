@@ -29,8 +29,9 @@ void mousePressed() {
   int tileSize[] = {width / b.getSize()[0], height / b.getSize()[1]};
   if (mouseButton == RIGHT) {
     if (keyPressed) {
-      save(count + ".png");
-      count++;
+      String timeString = year() + "-" + month() + "-" + day() + "-" + hour() + "-" + minute() + "-" + second() + "-" + millis() + ".png";
+      save("/render/" + timeString);
+      b.exportScalingMap();
     } else {
       b.addTile(mouseX/tileSize[0], mouseY/tileSize[1], 0);
     }

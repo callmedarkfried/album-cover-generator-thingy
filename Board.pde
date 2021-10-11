@@ -2,7 +2,9 @@ import java.util.ArrayList; //<>//
 public class Board {
   private BoardElement[][] board;
   private int currentScale = 10;
-
+  
+  private PImage scales;
+  
   PVector[] bp = {new PVector(3, 6), new PVector(10, 25), new PVector(40, 30)};
   Bot[] b = {new Bot(color(255, 0, 0), bp[0]), new Bot(color(0, 255, 0), bp[1]), new Bot(color(0, 0, 255), bp[2])};
   //  Bot[] b = {new Bot(color(255,164,0), bp[0])};
@@ -14,7 +16,8 @@ public class Board {
   Board (int sizeX, int sizeY) {
     colorMode(RGB, 255);
     color c = color(0);
-
+    
+    
     board = new BoardElement[sizeX][sizeY];
     for (int x = 0; x < board.length; x++) {
       for (int y = 0; y < board[x].length; y++) {
@@ -34,11 +37,15 @@ public class Board {
   Board (int sizeX, int sizeY, boolean testPattern) {
     colorMode(RGB, 255);
     color c = color(0);
-
+    
+    scales = loadImage("v1.png");
+    scales.loadPixels();
+    
     board = new BoardElement[sizeX][sizeY];
     for (int x = 0; x < board.length; x++) {
       for (int y = 0; y < board[x].length; y++) {
         PVector p = new PVector(x, y, 0);
+        float col = (255 - brightness(scales.pixels[y*scales.width + x])) / 200;
         board[x][y] = new Cell(c, p, b, board.length, board[x].length);
       }
     }
@@ -81,6 +88,28 @@ public class Board {
     }
     println("image");
     drawBoard();
+  }
+  
+  public void exportScalingMap() {
+    PImage scales = createImage(board.length, board[0].length, RGB);
+    scales.loadPixels();
+    
+    float max = 0;
+    for (int i = 0; i < scales.pixels.length; i++) {
+      max = max(max, ((Cell)board[i / board.length][i % board[0].length]).getScale());
+    };
+    max = max(20, max);
+    float fac = 255.0 / max;
+    
+    println(max);
+    for(int x = 0; x < board.length; x++) {
+      for(int y = 0; y < board[x].length; y++) {
+        scales.pixels[x + y*board[x].length] = color(min((int) (((Cell)board[x][y]).getScale() * fac), 255));
+      }
+    }
+    scales.updatePixels();
+    String timeString = year() + "-" + month() + "-" + day() + "-" + hour() + "-" + minute() + "-" + second() + "-" + millis() + ".png";
+    scales.save("/exports/" + timeString);
   }
   
   public void frame() {
