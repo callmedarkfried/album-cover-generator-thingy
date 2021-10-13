@@ -1,0 +1,14 @@
+shader hyperbolicLike(
+    float scale = 1.0,
+    float distFromOff = 1.0,
+    float divisor = 1.0,
+    int bsx = 1000,
+    int bsy = 1000,
+    output float out_scale = 0.0,
+    
+    )
+{
+    out_scale = scale * (sqrt(bsx*bsx/divisor + bsy*bsy/divisor)-(distFromOff))/(2*sqrt(bsx*bsx/divisor + bsy*bsy/divisor)/10);
+
+}
+

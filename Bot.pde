@@ -3,7 +3,7 @@ public class Bot implements BoardElement {
   private PVector pos;
   private Cell[] borderCellsUC;
   private Cell[] borderCellsC;
-  private Cell[] ownedCells;
+  private Cell[] ownedCells = {};
   Bot(color c, PVector p) {
     col = c;
     pos = p;

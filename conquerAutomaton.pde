@@ -2,10 +2,10 @@
 Board b;
 int count = 0;
 void setup() {
- size(1000, 1000);
+ size(1080, 1080);
  background(0);
  colorMode(RGB, 255);
- b = new Board(1000, 1000, true);
+ b = new Board(1080, 1080, true);
  strokeWeight(0);
  //b.drawBoard();
  frameRate(60);

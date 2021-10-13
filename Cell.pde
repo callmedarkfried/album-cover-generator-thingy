@@ -26,9 +26,9 @@ public class Cell implements BoardElement {
     float cosScale = 75;
     scale = 10;
     float dotGridScale = 1;
-    PVector centeroffset = new PVector(bsx/2, bsy/2, 0);
+    PVector centeroffset = new PVector(bsx, bsy, 0);
     float dotAmt = 40;
-    float dotFallOffStrength = 10;
+    float dotFallOffStrength = 3;
     float hyperbolicScale = 1;
     float tScale = scale;
     float stepCount = 6;
@@ -42,24 +42,49 @@ public class Cell implements BoardElement {
     scale = 1.0/bsx*(100*scale);
     // END OF DO NOT ALTER
     
-    PVector hbpos = cartesianToHyperbolic(scale(offsetPos, 0.01));
+    PVector hbpos = cartesianToHyperbolic(scale(offsetPos, 0.001));
     float hyperDist = sqrt(hbpos.x*hbpos.x + hbpos.y*hbpos.y);
-    if(hbpos.y % 10 > 9.9 || hbpos.x % 0.1 <= 0.001) {
-      scale = 0;
-    } else {
-      scale = 100;
-    }
-    scale = hyperDist;
+    //if(hbpos.y % 10 > 9 || hbpos.x % 10 > 9.9 || hbpos.x % 10 < .1) {
+    //  scale = 0;
+    //} else {
+    //  scale = 100;
+    //}
+    //scale = hyperDist;
     
-    scale = distFromOff / 200 / hyperDist;
+   // scale = distFromOff / 10 / hyperDist;
+   
     // these  methods can be combined in any way you want.
     //scale = hyperbolicLike(scale, distFromOff, hyperbolicScale);
-    //scale = primeCosineRings(scale, distFromOff, cosScale, 15, 0.6);
-    //scale = dotMatrix(10, offsetPos, dotAmt, dotFallOffStrength);
+    scale = primeCosineRings(scale, distFromOff, cosScale, 15, 0.6);
+    //scale = rays1(scale, offsetPos, hyperDist, dotFallOffStrength, 73, 325, 184);
+    
+    
+    ///////////////////////////
+    //float fac = 130;
+    //float offset = 2;
+    //float freq = hbpos.x * hbpos.y / 100 * 36;
+    
+    
+    // float f1 = -cos(radians((cartesianToPolar(offsetPos).x        ) * freq)) + 1;
+    // float f2 = -cos(radians((cartesianToPolar(offsetPos).x + 360.0/freq/3) * freq)) + 1;
+    // float f3 = -cos(radians((cartesianToPolar(offsetPos).x + 360.0/freq/3*2) * freq)) + 1;
+     
+    // scale = fac * min(f1, f2, f3) + offset;
+     ///////////////////////////////
+     //float m1 = ( (0.004 * (((cartesianToPolar(offsetPos).x + 180) * (0.885) + distFromOff)) * PI) + 1 )% 4;
+     //float m2 = ( (0.03 * (((-cartesianToPolar(offsetPos).x + 180) * (0.885) + distFromOff)) * PI) + 1 )% 10;
+     //scale = m1 + m2;
+    // radius: 325
+    //scale = 3;
     //scale = grid(scale, p, dotAmt, dotFallOffStrength);
     //scale = atanMap(scale, p.y, p.x, 1);
     //scale = dotGrid(dotGridScale, offsetPos.x, offsetPos.y, 100, 0.2, 150);
-    //scale = betterDots(2, p.x, p.y, 10, 0.4, 4, 8, 8, 10);
+    
+    /*
+    betterDots(scale, x, y, steps, stepSharpness, stepFalloff, subSteps, subSharpness, subFalloff)
+     */
+     
+    //scale = betterDots(1, offsetPos.x, offsetPos.y, 10, 0.4, 4, 8, 8, 10);
     //scale = betterDots(scale, cartesianToPolar(offsetPos).x, cartesianToPolar(offsetPos).y, 10, 0.4, 4, 10, 8, 10);
     
     
@@ -75,7 +100,7 @@ public class Cell implements BoardElement {
     //scale =  min(scale, dotMatrix(scale, offsetPos, dotAmt * hyperbolicLike(scale, distFromOff, hyperbolicScale), dotFallOffStrength));
     
     // s0
-    //scale = dotMatrix(scale, p, distFromOff, dotFallOffStrength);
+    //scale = dotMatrix(scale, hbpos, distFromOff, dotFallOffStrength);
     
     //s0 with more weirdness
     //scale = dotMatrix(scale, p, distFromOff, dotFallOffStrength);
@@ -87,7 +112,6 @@ public class Cell implements BoardElement {
     //flower thing
     //scale = flower(1, offsetPos, 12, 10, bsx * 0.2, 0.6, 0);
     //scale = flower2(1, offsetPos, 12, 10, bsx * 0.2, 0.6, 0,false);
-    
     
     
     //scale =altCosLines(6, p, 0.1, 0.5, 0.25, 1, 2);
@@ -140,14 +164,37 @@ Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
     scale = 1.0/bsx*(100*scale);
     // END OF DO NOT ALTER
     
-    scale = scl;
-    scale = dotMatrix(scale, p, dotAmt * hyperbolicLike(scale, distFromOff, hyperbolicScale), dotFallOffStrength);
+    PVector imgV = scale(offsetPos, scl);
+    float phase = 5;
+    float d = distance(scale(imgV, 0.05));
+    if (((int) (d + phase) / 5) % 2 == 0) {
+      scale = (d + phase) % 5;
+    } else {
+      scale = 5 - (d + phase) % 5;
+    }
+    
+    
+    
+    //scale = scl;
+    //scale = dotMatrix(scale, p, dotAmt * hyperbolicLike(scale, distFromOff, hyperbolicScale), dotFallOffStrength);
 }
+
+private float rays1(float scale, PVector offsetPos, float hyperDist, float dotFallOffStrength, float a, float b, float c) {
+      float gaussa = 73;
+      float gaussb = 325;
+      float gaussc = 184;
+      float distFromOff = distance(offsetPos);
+      float f1 = gaussc / (gaussa * sqrt(TWO_PI));
+      float f2 = -0.5 * pow((distFromOff - gaussb) / gaussa, 2);
+      float newscale = f1 * exp(f2);
+      
+      return dotMatrix(10, offsetPos, hyperDist, dotFallOffStrength) + 1/newscale;
+    }
 
   // Sort of hyperbolic but not really. DistFromOff is the distance a cell has from the specified center (PVector centeroffset), space is "compressed" according to how close
   // The cell is, meaning cells further away from the center are closer to EVERY cell at once.
   private float hyperbolicLike(float in, float distFromOff, float divisor) {
-    return in * (sqrt(bsx*bsx/divisor + bsy*bsy/divisor)-(distFromOff))/(2*sqrt(bsx*bsx/divisor + bsy*bsy/divisor)/10);
+    return in * (sqrt(bsx*bsx/divisor + bsy*bsy/divisor)-(distFromOff)) / (2*sqrt(bsx*bsx/divisor + bsy*bsy/divisor)/10);
   }
   
   private PVector scale(PVector in, float s) {
@@ -160,6 +207,10 @@ Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
   
   private PVector translate(PVector v, float x, float y) {
     return new PVector(v.x + x, v.y + y);
+  }
+  
+  private float distance(PVector v) {
+    return sqrt(v.x*v.x + v.y*v.y);
   }
   
   private float circles (float scaling, PVector p, float pow, float fac, float offset) {
@@ -315,8 +366,16 @@ Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
     return cscale;
   }
   
+  //OSLed
   private float primeCosineRings(float in, float distFromOff, float cosScale, float divisor, float offset) {
-    return in * (((cos(2*distFromOff*cosScale) +cos(3*distFromOff*cosScale) +cos(5*distFromOff*cosScale) +cos(7*distFromOff*cosScale) +cos(1*distFromOff*cosScale)) / divisor + offset));
+    return in * (
+    (
+      (
+      cos(2*distFromOff*cosScale)
+      +cos(3*distFromOff*cosScale) 
+      +cos(5*distFromOff*cosScale) 
+      +cos(7*distFromOff*cosScale) 
+      +cos(1*distFromOff*cosScale)) / divisor + offset));
   }
 
   private float dotMatrix(float in, PVector p, float dotAmt, float dotFallOffStrength) {
@@ -391,16 +450,18 @@ Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
       return 0;
    }
    
+   //OSLed
    private PVector cartesianToPolar(PVector in) {
      PVector out = new PVector(0,0);
      
-     out.x = degrees(atan(in.y / in.x));
+     out.x = degrees(atan2(in.y , in.x));
      out.y = sqrt(in.x*in.x + in.y*in.y);
      
      return out;
    }
    
-      private PVector cartesianToHyperbolicLike(PVector in) {
+   //OSLed
+   private PVector cartesianToHyperbolicLike(PVector in) {
      PVector out = new PVector(0,0);
      in = cartesianToPolar(in);
      
@@ -414,9 +475,10 @@ Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
      return out;
    }
    
-    private PVector cartesianToHyperbolic(PVector in) {
+   //
+   private PVector cartesianToHyperbolicOld(PVector in) {
      PVector out = new PVector(0,0);
-     
+     PVector s = in;
      if(in.y == 0) in.y = 0.0001;
      if(in.x == 0) in.x = 0.0001; 
      
@@ -430,13 +492,49 @@ Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
      float r = out.y;
      float t = out.x;
      
-     out.y = (r) * abs((float) Math.cos(radians(t)));
+     out.y = (r) * ((float) Math.cos(radians(t)));
      out.x = (r) * abs((float) Math.sin(radians(t)));
-     
+     out.x = cartesianToPolar(s).x + 180;
      
      
      return out;
    }
+   
+   private PVector cartesianToParabolic(PVector in) {
+     PVector out = new PVector(0,0);
+     PVector s = in;
+     if(in.y == 0) in.y = 0.0001;
+     if(in.x == 0) in.x = 0.0001; 
+     
+     
+     if (in.x > 0 && in.y <= 0) in.y *= -1;
+     if (in.x < 0 && in.y >= 0) in.y *= -1;
+     
+     out.x = sqrt( (sqrt(in.x*in.x + in.y*in.y) + in.x ) / 2 );
+     out.y = sqrt( (sqrt(in.x*in.x + in.y*in.y) - in.x ) / 2 );
+     
+     
+     return out;
+   }
+   
+   // OSLed
+   private PVector cartesianToHyperbolic(PVector in) {
+     PVector out = new PVector(0,0);
+     PVector s = in;
+     if(in.y == 0) in.y = 0.0001;
+     if(in.x == 0) in.x = 0.0001; 
+     
+     
+     if (in.x > 0 && in.y <= 0) in.y *= -1;
+     if (in.x < 0 && in.y >= 0) in.y *= -1;
+     
+     out.y = sqrt( sign(in.x + in.y) * sign(in.y - in.x) * (in.y*in.y - in.x*in.x) / 2 );
+     out.x = sqrt( sign(in.x) * sign(in.y) * in.x * in.y);
+     
+     
+     return out;
+   }
+   //
    private PVector euclidToExponential(PVector in) {
      PVector out = new PVector(0,0);
      
@@ -449,6 +547,12 @@ Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
      
      return out;
    }
+   
+   private int sign(float f) {
+      if (f > 0) return 1;
+      if (f < 0) return -1;
+      return 0;
+    } 
    
    private float betterDots(float scale, float x, float y, 
                            float steps, float stepSharpness, float stepFalloff,
@@ -508,7 +612,8 @@ Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
         setScore(b, 0);
         return;
       }
-      for (Cell cell : agents[i].getBorderCellsUC()) {
+      
+      for (Cell cell : agents[i].getOwnedCells()) {
         if (b != agents[i]) continue;
         int dx = (int) abs(cell.getPosition().x - pos.x);
         int dy = (int) abs(cell.getPosition().y - pos.y);
@@ -552,6 +657,7 @@ Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY, float scl) {
   public void setOwner(Bot o) {
     owner = o;
     col = o.getColor();
+    o.conquerClaimedCell(this);
   }
 
   public color getColor() {

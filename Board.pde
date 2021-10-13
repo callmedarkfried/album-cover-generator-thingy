@@ -38,12 +38,14 @@ public class Board {
     colorMode(RGB, 255);
     color c = color(0);
     
+    scales = loadImage("flame.png");
+    scales.loadPixels();
     
     board = new BoardElement[sizeX][sizeY];
     for (int x = 0; x < board.length; x++) {
       for (int y = 0; y < board[x].length; y++) {
         PVector p = new PVector(x, y, 0);
-        float col = (255 - brightness(scales.pixels[y*scales.width + x])) / 200;
+        //float col = (255 - brightness(scales.pixels[y*scales.width + x])) / 200;
         board[x][y] = new Cell(c, p, b, board.length, board[x].length);
       }
     }
@@ -54,7 +56,9 @@ public class Board {
     //  board[125][(int) (i*i*i / 10.648)].setOwner(b[0]);
     //  board[125][249 - (int) (i*i*i / 10.648)].setOwner(b[0]);
     //}
-    if (testPattern) frame();
+    if (testPattern) {
+      frame();
+    }
   }
 
   public int[] getSize() {
@@ -110,6 +114,40 @@ public class Board {
     scales.save("/exports/" + timeString);
   }
   
+  public void spiral(float angle) {
+    float step = 12;
+    float anglestep = 12;
+    int count = 0;
+    //
+    for (float r = 0.0; r < sqrt(board.length*board.length + board[0].length*board[0].length); r += step) {
+      
+      int x = (int) (r * cos(radians(angle + anglestep / 3)));
+      int y = (int) (r * sin(radians(angle + anglestep / 3)));
+      if(abs(x) < board.length/2 && abs(y) < board[x+board.length/2].length/2) {
+        board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[0]);
+        count++;
+      }
+      
+      x = (int) ((r + 10) * cos(radians(angle)));
+      y = (int) ((r +10) * sin(radians(angle)));
+      if(abs(x) < board.length/2 && abs(y) < board[x+board.length/2].length/2) {
+        board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[1]);
+        count++;
+      }
+      
+      x = (int) ((r +20) * cos(radians(angle - anglestep / 3)));
+      y = (int) ((r +20) * sin(radians(angle - anglestep / 3)));
+      if(abs(x) < board.length/2 && abs(y) < board[x+board.length/2].length/2) {
+        board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[2]);
+        count++;
+      }
+      angle -= anglestep;
+      
+    }
+    println("spiral done", count);
+    
+  }
+  
   public void frame() {
     clearOwners();
     int numberOfDots = 36;
@@ -117,18 +155,22 @@ public class Board {
     for (float i = 0; i < numberOfDots; i++) {
       int r = int(board.length * 0.65 / 2);
       int x = (int) (r * cos(radians(360.0/numberOfDots*i)));
-      int y = (int) (r * sin(radians(360/numberOfDots*i)));
-      board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[0]);
-
+      int y = (int) (r * sin(radians(360.0/numberOfDots*i)));
+      if(abs(x) < board.length/2 && abs(y) < board[x+board.length/2].length/2) {
+        board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[0]);
+      }
       r = int(board.length * 0.6 / 2);
-      x = (int) (r * cos(i+0.5/TWO_PI));
-      y = (int) (r * sin(i+0.5/TWO_PI));
-      board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[1]);
-
+      x = (int) (r * cos(radians(360.0/numberOfDots*i + 3.333)));
+      y = (int) (r * sin(radians(360.0/numberOfDots*i + 3.333)));
+      if(abs(x) < board.length/2 && abs(y) < board[x+board.length/2].length/2) {
+        board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[1]);
+      }
       r = int(board.length * 0.55 / 2);
-      x = (int) (r * cos(i+1/TWO_PI));
-      y = (int) (r * sin(i+1/TWO_PI));
-      board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[2]);
+      x = (int) (r * cos(radians(360.0/numberOfDots*i + 6.666)));
+      y = (int) (r * sin(radians(360.0/numberOfDots*i + 6.666)));
+      if(abs(x) < board.length/2 && abs(y) < board[x+board.length/2].length/2) {
+        board[x+board.length/2][y+board[x+board.length/2].length/2].setOwner(b[2]);
+      }
     }
   }
   void clearOwners() {
@@ -150,11 +192,12 @@ public class Board {
     sendBorderUpdateClaimed(b[0]);
     sendBorderUpdateClaimed(b[1]);
     sendBorderUpdateClaimed(b[2]);
-    setScore(b[0]);
-    setScore(b[1]);
-    setScore(b[2]);
+    
     for (int x = 0; x < board.length; x++) {
       for (int y = 0; y < board[x].length; y++) {
+        setScore(b[0], x, y);
+        setScore(b[1], x, y);
+        setScore(b[2], x, y);
         int xPos = width / board.length * x + width / board.length / 2;
         int yPos =  height / board[x].length * y +  height / board[x].length / 2;
         int xSize = width / board.length + 1;
@@ -223,18 +266,21 @@ public class Board {
         if (board[x][y].getOwner() != null && board[x][y].getOwner() != c) {
           //                       x+      y+     x-    y-
           boolean[] directions = {
-            (x < board.length - 1 && board[x+1][y].getOwner() != null && board[x+1][y].getOwner() == c), 
-            (y < board[x].length - 1 && board[x][y+1].getOwner() != null && board[x][y+1].getOwner() == c), 
-            (x > 0 && board[x-1][y].getOwner() != null && board[x-1][y].getOwner() == c), 
-            (y > 0 && board[x][y-1].getOwner() != null && board[x][y-1].getOwner() == c)
+            (x < board.length - 1 && board[x+1][y].getOwner() != c && board[x][y].getOwner() == c), 
+            (y < board[x].length - 1 && board[x][y+1].getOwner() != c && board[x][y].getOwner() == c), 
+            (x > 0 && board[x-1][y].getOwner() != c && board[x][y].getOwner() == c), 
+            (y > 0 && board[x][y-1].getOwner() != c && board[x][y].getOwner() == c)
           };
+          if(directions[2]) println("AA");
           int b = 255 - ((board[x][y].getOwner().getColor() + 256 * 256 * 256) % 256);
           int g = 255 - ((board[x][y].getOwner().getColor() + 256 * 256 * 256) / 256 % 256);
           int r = 255 - ((board[x][y].getOwner().getColor() + 256 * 256 * 256) / 256 / 256);
-          if (directions[0] || directions[1] || directions[2] || directions[3]) {
+          
+          //if (directions[0] || directions[1] || directions[2] || directions[3]) {
+          if (board[x][y].getOwner() == c) {
             claimedBorder.add((Cell) board[x][y]);
             // debug
-            board[x][y].setColor(color(r, g, b));
+            //board[x][y].setColor(color(r, g, b));
           }
         }
       }
@@ -243,16 +289,16 @@ public class Board {
     c.updateBordersC(bordersC);
   }
 
-  public void setScore(Bot bot) {
+  public void setScore(Bot bot, int x, int y) {
 
-    for (int x = 0; x < board.length; x++) {
-      for (int y = 0; y < board[x].length; y++) {
+    //for (int x = 0; x < board.length; x++) {
+    //  for (int y = 0; y < board[x].length; y++) {
         //if (board[x][y].getOwner() == null) {
         ((Cell)board[x][y]).calculateScore(bot);
 
         //}
-      }
-    }
+    //  }
+    //}
   }
 
   public int randInt(int min, int max) {

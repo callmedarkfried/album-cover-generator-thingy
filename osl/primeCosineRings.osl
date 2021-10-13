@@ -1,0 +1,18 @@
+shader primeCosineRings(
+    float fac = 1.0,
+    float distFromOff = 1.0,
+    float cosScale = 1.0,
+    float divisor = 1.0,
+    float offset = 0.0,
+    output float out_scale = 1.0
+    )
+{
+    float c1 = cos(1*distFromOff*cosScale);
+    float c2 = cos(2*distFromOff*cosScale);
+    float c3 = cos(3*distFromOff*cosScale);
+    float c5 = cos(5*distFromOff*cosScale);
+    float c7 = cos(7*distFromOff*cosScale);
+    float cosSum = c1 + c2 + c3 + c5 + c7;
+    out_scale = fac * (cosSum / divisor + offset);
+}
+

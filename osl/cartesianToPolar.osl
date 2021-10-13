@@ -1,0 +1,9 @@
+shader cartesianToPolar(
+    vector Cartesian = vector(0,0,0),
+    output vector Polar = vector(0,0,0)
+    )
+{
+    Polar.x = (atan2(Cartesian.y, Cartesian.x));
+    Polar.y = sqrt(Cartesian.x*Cartesian.x + Cartesian.y*Cartesian.y);
+}
+

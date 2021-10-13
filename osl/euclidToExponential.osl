@@ -1,0 +1,16 @@
+shader cartesianToHyperbolic(
+    vector Cartesian = vector(0,0,0),
+    float Fac = 100.0,
+    output vector Exponential = vector(0,0,0)
+    )
+{
+    vector temp = vector(0,0,0);
+    temp.x = (atan2(Cartesian.y, Cartesian.x));
+    temp.y = sqrt(Cartesian.x*Cartesian.x + Cartesian.y*Cartesian.y);
+    
+    temp.y = exp(temp.y/Fac);
+    
+    Exponential.y = temp.y * (cos(temp.x));
+    Exponential.x = temp.y * (sin(temp.x));
+}
+
