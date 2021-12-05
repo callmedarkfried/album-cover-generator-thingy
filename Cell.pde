@@ -10,7 +10,7 @@ public class Cell implements BoardElement {
   private float scale;
   private int bsx;
   private int bsy;
-//\left(\left|\frac{\left((\left|x\right|^{b}+\left|y\right|^{c})^{h}\right)}{(\left|x\right|^{\left(d-f\right)}-\left|y\right|^{\left(d-g\right)})}\right|\right)=a
+//\left(\left|\frac{\left((k\left|x\right|^{b}+l\left|y\right|^{c})^{h}\right)}{m\left|x\right|^{\left(d-f\right)}-n\left|y\right|^{\left(d-g\right)}}\right|\right)-a=0
   Cell(color c, PVector p, Bot[] b, int boardSizeX, int boardSizeY) {
     bsx = boardSizeX;
     bsy = boardSizeY;
